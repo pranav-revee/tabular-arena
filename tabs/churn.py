@@ -65,22 +65,26 @@ def _leaderboard(df):
             wcol = ' style="color:#475569;"' if cls == "worst" else ""
             cells += f'<td class="r {cls}"{wcol}>{fmt.format(r[c])}</td>'
 
-        rows += f"""<tr>
-<td><span class="rank-badge {rcls}">{rank}</span></td>
-<td><div style="display:flex;align-items:center;gap:10px;">
-    <div style="width:3px;height:22px;border-radius:2px;background:{color};"></div>
-    <div><div class="model-name" style="color:#f8fafc;">{r['Model']}</div>
-    <div style="font-size:0.7rem;color:{cat_color};">{r['Category']}</div></div>
-</div></td>
-{cells}
-</tr>"""
+        rows += (
+            f'<tr>'
+            f'<td><span class="rank-badge {rcls}">{rank}</span></td>'
+            f'<td><div style="display:flex;align-items:center;gap:10px;">'
+            f'<div style="width:3px;height:22px;border-radius:2px;background:{color};"></div>'
+            f'<div><div class="model-name" style="color:#f8fafc;">{r["Model"]}</div>'
+            f'<div style="font-size:0.7rem;color:{cat_color};">{r["Category"]}</div></div>'
+            f'</div></td>'
+            f'{cells}'
+            f'</tr>'
+        )
 
-    return f"""<div class="card" style="padding:0;overflow:hidden;">
-<table class="lb"><thead><tr>
-    <th style="width:44px">#</th><th>Model</th>
-    <th class="r">AUC-ROC</th><th class="r">Log Loss</th>
-    <th class="r">Time</th><th class="r">Memory</th><th class="r">Infer</th>
-</tr></thead><tbody>{rows}</tbody></table></div>"""
+    return (
+        '<div class="card" style="padding:0;overflow:hidden;">'
+        '<table class="lb"><thead><tr>'
+        '<th style="width:44px">#</th><th>Model</th>'
+        '<th class="r">AUC-ROC</th><th class="r">Log Loss</th>'
+        '<th class="r">Time</th><th class="r">Memory</th><th class="r">Infer</th>'
+        f'</tr></thead><tbody>{rows}</tbody></table></div>'
+    )
 
 
 def _handling(models, df):
@@ -104,20 +108,24 @@ def _handling(models, df):
             lbl, cls = badge.get(h.get(k, ""), ("?", "pill-gray"))
             return f'<span class="pill {cls}">{lbl}</span>'
 
-        rows += f"""<tr>
-<td><div style="display:flex;align-items:center;gap:8px;">
-    <div style="width:3px;height:18px;border-radius:2px;background:{color};"></div>
-    <span class="model-name" style="font-size:0.83rem;color:#e2e8f0;">{m['name']}</span>
-</div></td>
-<td>{pill('missing_values')}</td>
-<td>{pill('categorical_features')}</td>
-<td>{pill('class_imbalance')}</td>
-</tr>"""
+        rows += (
+            f'<tr>'
+            f'<td><div style="display:flex;align-items:center;gap:8px;">'
+            f'<div style="width:3px;height:18px;border-radius:2px;background:{color};"></div>'
+            f'<span class="model-name" style="font-size:0.83rem;color:#e2e8f0;">{m["name"]}</span>'
+            f'</div></td>'
+            f'<td>{pill("missing_values")}</td>'
+            f'<td>{pill("categorical_features")}</td>'
+            f'<td>{pill("class_imbalance")}</td>'
+            f'</tr>'
+        )
 
-    return f"""<div class="card" style="padding:0;overflow:hidden;">
-<table class="lb"><thead><tr>
-    <th>Model</th><th>Missing Values</th><th>Categoricals</th><th>Class Imbalance</th>
-</tr></thead><tbody>{rows}</tbody></table></div>"""
+    return (
+        '<div class="card" style="padding:0;overflow:hidden;">'
+        '<table class="lb"><thead><tr>'
+        '<th>Model</th><th>Missing Values</th><th>Categoricals</th><th>Class Imbalance</th>'
+        f'</tr></thead><tbody>{rows}</tbody></table></div>'
+    )
 
 
 def render():
@@ -139,25 +147,23 @@ def render():
     fast = df.loc[df["Train Time (s)"].idxmin()]
     light = df.loc[df["Memory (MB)"].idxmin()]
 
-    st.markdown(f"""
-<div class="bento bento-3" style="margin:1rem 0 2rem 0;">
-    <div class="metric-card">
-        <div class="metric-label">Best AUC · {label}</div>
-        <div class="metric-value">{top['AUC-ROC']:.4f}</div>
-        <div class="metric-detail">{top['Model']}</div>
-    </div>
-    <div class="metric-card">
-        <div class="metric-label">Fastest</div>
-        <div class="metric-value">{fast['Train Time (s)']:.1f}s</div>
-        <div class="metric-detail">{fast['Model']}</div>
-    </div>
-    <div class="metric-card">
-        <div class="metric-label">Lightest</div>
-        <div class="metric-value">{light['Memory (MB)']:.0f}<span style="font-size:0.9rem;color:#9ca3af;">MB</span></div>
-        <div class="metric-detail">{light['Model']}</div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    def mc(lbl, val, detail):
+        return (
+            f'<div class="metric-card">'
+            f'<div class="metric-label">{lbl}</div>'
+            f'<div class="metric-value">{val}</div>'
+            f'<div class="metric-detail">{detail}</div>'
+            f'</div>'
+        )
+
+    st.markdown(
+        f'<div class="bento bento-3" style="margin:1rem 0 2rem 0;">'
+        + mc(f"Best AUC · {label}", f"{top['AUC-ROC']:.4f}", top["Model"])
+        + mc("Fastest", f"{fast['Train Time (s)']:.1f}s", fast["Model"])
+        + mc("Lightest", f'{light["Memory (MB)"]:.0f}<span style="font-size:0.9rem;color:#64748b;">MB</span>', light["Model"])
+        + '</div>',
+        unsafe_allow_html=True,
+    )
 
     # Leaderboard
     st.markdown('<div class="section-header">Leaderboard</div>', unsafe_allow_html=True)
