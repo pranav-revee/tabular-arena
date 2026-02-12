@@ -2,8 +2,9 @@
 Run the remaining models (AutoGluon, TabPFN, FT-Transformer) and append to existing results.
 """
 import json
+import os
 import time
-import tracemalloc
+import psutil
 import warnings
 import sys
 from pathlib import Path
@@ -52,7 +53,8 @@ def run_autogluon(X_train, X_test, y_train, y_test, X_full, y_full):
     tmpdir = tempfile.mkdtemp()
     print("  AutoGluon: fitting (single run)...")
 
-    tracemalloc.start()
+    process = psutil.Process(os.getpid())
+    rss_before = process.memory_info().rss
     t0 = time.time()
 
     train_df = X_train.copy()
@@ -67,8 +69,8 @@ def run_autogluon(X_train, X_test, y_train, y_test, X_full, y_full):
     )
 
     train_time = time.time() - t0
-    _, peak_mem = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
+    rss_after = process.memory_info().rss
+    peak_mem_mb = max(0.0, (rss_after - rss_before) / (1024 ** 2))
 
     y_prob = predictor.predict_proba(X_test)[1].values
     inf_start = time.time()
@@ -80,14 +82,14 @@ def run_autogluon(X_train, X_test, y_train, y_test, X_full, y_full):
     inf_per_1k = (inf_time / len(X_test)) * 1000 * 1000
 
     print(f"  AUC: {auc:.4f} | Log Loss: {ll:.4f}")
-    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem / (1024**2):.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
+    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem_mb:.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
 
     metrics = {
         "auc_roc": round(auc, 4),
         "log_loss": round(ll, 4),
         "train_time_sec": round(train_time, 2),
         "inference_time_ms_per_1k": round(inf_per_1k, 1),
-        "peak_memory_mb": round(peak_mem / (1024**2), 1),
+        "peak_memory_mb": round(peak_mem_mb, 1),
     }
     shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -152,13 +154,14 @@ def run_tabpfn(X_train, X_test, y_train, y_test, X_full, y_full):
     X_tr_enc, X_te_enc = encode_for_numeric(X_train, X_test)
 
     print("  TabPFN: fitting...")
-    tracemalloc.start()
+    process = psutil.Process(os.getpid())
+    rss_before = process.memory_info().rss
     t0 = time.time()
     model = TabPFNClassifier(device="cpu", ignore_pretraining_limits=True)
     model.fit(X_tr_enc, y_train)
     train_time = time.time() - t0
-    _, peak_mem = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
+    rss_after = process.memory_info().rss
+    peak_mem_mb = max(0.0, (rss_after - rss_before) / (1024 ** 2))
 
     inf_start = time.time()
     y_prob = model.predict_proba(X_te_enc)[:, 1]
@@ -169,14 +172,14 @@ def run_tabpfn(X_train, X_test, y_train, y_test, X_full, y_full):
     ll = log_loss(y_test, y_prob)
 
     print(f"  AUC: {auc:.4f} | Log Loss: {ll:.4f}")
-    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem / (1024**2):.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
+    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem_mb:.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
 
     metrics = {
         "auc_roc": round(auc, 4),
         "log_loss": round(ll, 4),
         "train_time_sec": round(train_time, 2),
         "inference_time_ms_per_1k": round(inf_per_1k, 1),
-        "peak_memory_mb": round(peak_mem / (1024**2), 1),
+        "peak_memory_mb": round(peak_mem_mb, 1),
     }
 
     # CV
@@ -277,12 +280,13 @@ def run_ft_transformer(X_train, X_test, y_train, y_test, X_full, y_full):
             return torch.sigmoid(model(Xt)).numpy()
 
     print("  FT-Transformer: fitting...")
-    tracemalloc.start()
+    process = psutil.Process(os.getpid())
+    rss_before = process.memory_info().rss
     t0 = time.time()
     model = train_model(X_tr_enc, y_train)
     train_time = time.time() - t0
-    _, peak_mem = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
+    rss_after = process.memory_info().rss
+    peak_mem_mb = max(0.0, (rss_after - rss_before) / (1024 ** 2))
 
     inf_start = time.time()
     y_prob = predict(model, X_te_enc)
@@ -293,14 +297,14 @@ def run_ft_transformer(X_train, X_test, y_train, y_test, X_full, y_full):
     ll = log_loss(y_test, y_prob)
 
     print(f"  AUC: {auc:.4f} | Log Loss: {ll:.4f}")
-    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem / (1024**2):.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
+    print(f"  Train: {train_time:.1f}s | Memory: {peak_mem_mb:.0f}MB | Infer: {inf_per_1k:.1f}ms/1k")
 
     metrics = {
         "auc_roc": round(auc, 4),
         "log_loss": round(ll, 4),
         "train_time_sec": round(train_time, 2),
         "inference_time_ms_per_1k": round(inf_per_1k, 1),
-        "peak_memory_mb": round(peak_mem / (1024**2), 1),
+        "peak_memory_mb": round(peak_mem_mb, 1),
     }
 
     # CV

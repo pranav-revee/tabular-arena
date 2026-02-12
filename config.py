@@ -17,6 +17,8 @@ MODEL_COLORS = {
     "LightGBM (Tuned)":    "#00BFA5",
     "CatBoost (Default)":  "#80CBC4",
     "CatBoost (Tuned)":    "#4DB6AC",
+    "XGBoost (Default)":   "#26A69A",
+    "XGBoost (Tuned)":     "#009688",
     "AutoGluon":           "#BB86FC",
     "TabPFN":              "#FF7597",
     "FT-Transformer":      "#FFB74D",
@@ -27,6 +29,8 @@ MODEL_CATEGORIES = {
     "LightGBM (Tuned)":    "Gradient Boosting",
     "CatBoost (Default)":  "Gradient Boosting",
     "CatBoost (Tuned)":    "Gradient Boosting",
+    "XGBoost (Default)":   "Gradient Boosting",
+    "XGBoost (Tuned)":     "Gradient Boosting",
     "AutoGluon":           "AutoML",
     "TabPFN":              "Foundation Model",
     "FT-Transformer":      "Deep Learning",
@@ -94,6 +98,7 @@ DATASET_INFO = {
 DEFAULT_MODELS = [
     "LightGBM (Default)",
     "CatBoost (Default)",
+    "XGBoost (Default)",
     "AutoGluon",
     "TabPFN",
     "FT-Transformer",
@@ -102,6 +107,7 @@ DEFAULT_MODELS = [
 TUNED_MODELS = [
     "LightGBM (Tuned)",
     "CatBoost (Tuned)",
+    "XGBoost (Tuned)",
     "AutoGluon",
     "TabPFN",
     "FT-Transformer",

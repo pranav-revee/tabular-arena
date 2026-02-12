@@ -5,7 +5,7 @@ Trains all models on the same data/splits, collects metrics, writes results JSON
 
 import json
 import time
-import tracemalloc
+import psutil
 import platform
 import os
 import warnings
@@ -103,16 +103,16 @@ def measure_model(name, train_fn, predict_fn, X_train, X_test, y_train, y_test):
     print(f"  Running: {name}")
     print(f"{'='*60}")
 
-    # Memory tracking
-    tracemalloc.start()
+    # Memory tracking (RSS via psutil — captures C-level allocations)
+    process = psutil.Process(os.getpid())
+    rss_before = process.memory_info().rss
     start_time = time.time()
 
     model = train_fn(X_train, y_train)
 
     train_time = time.time() - start_time
-    _, peak_memory = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-    peak_memory_mb = peak_memory / (1024 * 1024)
+    rss_after = process.memory_info().rss
+    peak_memory_mb = max(0.0, (rss_after - rss_before) / (1024 * 1024))
 
     # Predictions
     inf_start = time.time()
@@ -250,9 +250,11 @@ def run_lgbm_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
             aucs.append(roc_auc_score(y_train.iloc[val_idx], pred))
         return np.mean(aucs)
 
+    search_start = time.time()
     print(f"\n  Optuna: {OPTUNA_TRIALS} trials...")
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=OPTUNA_TRIALS)
+    search_time = time.time() - search_start
     best = study.best_params
     n_rounds = best.pop("n_rounds")
     best.update({"objective": "binary", "metric": "auc", "verbosity": -1})
@@ -269,6 +271,10 @@ def run_lgbm_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
         X_tr_enc, X_te_enc, y_train, y_test
     )
 
+    metrics["search_time_sec"] = round(search_time, 2)
+    metrics["fit_time_sec"] = metrics["train_time_sec"]
+    metrics["train_time_sec"] = round(search_time + metrics["fit_time_sec"], 2)
+
     def prep(Xtr, Xte):
         return encode_for_lgbm(Xtr, Xte)[:2]
 
@@ -281,6 +287,139 @@ def run_lgbm_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
 
     return {
         "name": "LightGBM (Tuned)",
+        "category": "gradient_boosting",
+        "tuned": True,
+        "metrics": metrics,
+        "scaling": scaling,
+        "raw_data_handling": {
+            "missing_values": "native",
+            "categorical_features": "needs_encoding",
+            "class_imbalance": "scale_pos_weight",
+        },
+    }
+
+
+# ── XGBoost (Default) ──────────────────────────────────────────────────────
+def run_xgb_default(X_train, X_test, y_train, y_test, X_full, y_full):
+    import xgboost as xgb
+
+    def prep(Xtr, Xte):
+        return encode_for_lgbm(Xtr, Xte)[:2]
+
+    def train_fn(X, y):
+        dtrain = xgb.DMatrix(X, label=y)
+        params = {
+            "objective": "binary:logistic",
+            "eval_metric": "auc",
+            "verbosity": 0,
+            "nthread": -1,
+        }
+        return xgb.train(params, dtrain, num_boost_round=100)
+
+    def predict_fn(model, X):
+        return model.predict(xgb.DMatrix(X))
+
+    X_tr_enc, X_te_enc, _ = encode_for_lgbm(X_train, X_test)
+
+    _, metrics = measure_model(
+        "XGBoost (Default)", train_fn, predict_fn,
+        X_tr_enc, X_te_enc, y_train, y_test
+    )
+
+    print("  CV AUC...")
+    metrics["auc_roc"] = cv_auc(train_fn, predict_fn, X_full, y_full, prep_fn=prep)
+    print(f"  CV AUC: {metrics['auc_roc']}")
+
+    print("  Scaling curve...")
+    scaling = scaling_curve(train_fn, predict_fn, X_tr_enc, X_te_enc, y_train, y_test)
+
+    return {
+        "name": "XGBoost (Default)",
+        "category": "gradient_boosting",
+        "tuned": False,
+        "metrics": metrics,
+        "scaling": scaling,
+        "raw_data_handling": {
+            "missing_values": "native",
+            "categorical_features": "needs_encoding",
+            "class_imbalance": "scale_pos_weight",
+        },
+    }
+
+
+# ── XGBoost (Tuned) ────────────────────────────────────────────────────────
+def run_xgb_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
+    import xgboost as xgb
+    import optuna
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+    X_tr_enc, X_te_enc, _ = encode_for_lgbm(X_train, X_test)
+
+    def objective(trial):
+        params = {
+            "objective": "binary:logistic",
+            "eval_metric": "auc",
+            "verbosity": 0,
+            "max_depth": trial.suggest_int("max_depth", 3, 10),
+            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+            "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+            "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
+            "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
+            "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
+        }
+        n_rounds = trial.suggest_int("n_rounds", 50, 500)
+
+        skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=RANDOM_STATE)
+        aucs = []
+        for tr_idx, val_idx in skf.split(X_tr_enc, y_train):
+            dtrain = xgb.DMatrix(X_tr_enc.iloc[tr_idx], label=y_train.iloc[tr_idx])
+            dval = xgb.DMatrix(X_tr_enc.iloc[val_idx], label=y_train.iloc[val_idx])
+            model = xgb.train(params, dtrain, num_boost_round=n_rounds,
+                              evals=[(dval, "val")], early_stopping_rounds=10,
+                              verbose_eval=False)
+            pred = model.predict(dval)
+            aucs.append(roc_auc_score(y_train.iloc[val_idx], pred))
+        return np.mean(aucs)
+
+    search_start = time.time()
+    print(f"\n  Optuna: {OPTUNA_TRIALS} trials...")
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=OPTUNA_TRIALS)
+    search_time = time.time() - search_start
+
+    best = study.best_params
+    n_rounds = best.pop("n_rounds")
+    best.update({"objective": "binary:logistic", "eval_metric": "auc", "verbosity": 0})
+
+    def train_fn(X, y):
+        dtrain = xgb.DMatrix(X, label=y)
+        return xgb.train(best, dtrain, num_boost_round=n_rounds)
+
+    def predict_fn(model, X):
+        return model.predict(xgb.DMatrix(X))
+
+    _, metrics = measure_model(
+        "XGBoost (Tuned)", train_fn, predict_fn,
+        X_tr_enc, X_te_enc, y_train, y_test
+    )
+
+    metrics["search_time_sec"] = round(search_time, 2)
+    metrics["fit_time_sec"] = metrics["train_time_sec"]
+    metrics["train_time_sec"] = round(search_time + metrics["fit_time_sec"], 2)
+
+    def prep(Xtr, Xte):
+        return encode_for_lgbm(Xtr, Xte)[:2]
+
+    print("  CV AUC...")
+    metrics["auc_roc"] = cv_auc(train_fn, predict_fn, X_full, y_full, prep_fn=prep)
+    print(f"  CV AUC: {metrics['auc_roc']}")
+
+    print("  Scaling curve...")
+    scaling = scaling_curve(train_fn, predict_fn, X_tr_enc, X_te_enc, y_train, y_test)
+
+    return {
+        "name": "XGBoost (Tuned)",
         "category": "gradient_boosting",
         "tuned": True,
         "metrics": metrics,
@@ -366,9 +505,11 @@ def run_catboost_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
             aucs.append(roc_auc_score(y_train.iloc[val_idx], pred))
         return np.mean(aucs)
 
+    search_start = time.time()
     print(f"\n  Optuna: {OPTUNA_TRIALS} trials...")
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=OPTUNA_TRIALS)
+    search_time = time.time() - search_start
     best = study.best_params
     best.update({"verbose": 0, "random_seed": RANDOM_STATE, "cat_features": cat_cols, "eval_metric": "AUC"})
 
@@ -384,6 +525,10 @@ def run_catboost_tuned(X_train, X_test, y_train, y_test, X_full, y_full):
         "CatBoost (Tuned)", train_fn, predict_fn,
         X_train, X_test, y_train, y_test
     )
+
+    metrics["search_time_sec"] = round(search_time, 2)
+    metrics["fit_time_sec"] = metrics["train_time_sec"]
+    metrics["train_time_sec"] = round(search_time + metrics["fit_time_sec"], 2)
 
     print("  CV AUC...")
     metrics["auc_roc"] = cv_auc(train_fn, predict_fn, X_full, y_full)
@@ -415,7 +560,8 @@ def run_autogluon(X_train, X_test, y_train, y_test, X_full, y_full):
 
     # Single fit for timing/memory measurement
     print("  Fitting AutoGluon (single run for metrics)...")
-    tracemalloc.start()
+    process = psutil.Process(os.getpid())
+    rss_before = process.memory_info().rss
     start_time = time.time()
 
     train_df = X_train.copy()
@@ -425,8 +571,8 @@ def run_autogluon(X_train, X_test, y_train, y_test, X_full, y_full):
     ).fit(train_df, presets="medium_quality", time_limit=120)
 
     train_time = time.time() - start_time
-    _, peak_memory = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
+    rss_after = process.memory_info().rss
+    peak_memory = max(0, rss_after - rss_before)
 
     # Predictions
     inf_start = time.time()
