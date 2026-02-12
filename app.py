@@ -54,11 +54,11 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.06);
     }
     .stTabs [aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #f8fafc !important;
+        background: #1e293b !important;
+        color: #ffffff !important;
         font-weight: 600;
-        border-bottom: 2px solid transparent !important;
-        border-image: linear-gradient(90deg, #3b82f6, #ec4899, #06b6d4) 1 !important;
+        border-bottom: none !important;
+        border-image: none !important;
     }
     .stTabs [data-baseweb="tab-highlight"],
     .stTabs [data-baseweb="tab-border"] { display: none; }
@@ -73,11 +73,7 @@ st.markdown("""
         -webkit-backdrop-filter: blur(20px);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
+    /* no hover on static cards */
 
     /* ── Metric Cards with vibrant left borders ── */
     .metric-card {
@@ -90,11 +86,7 @@ st.markdown("""
         border-left: 3px solid;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .metric-card:hover {
-        background: rgba(255, 255, 255, 0.07);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
+    /* no hover on static metric cards */
     .metric-card:nth-child(4n+1) { border-left-color: #3b82f6; }
     .metric-card:nth-child(4n+2) { border-left-color: #ec4899; }
     .metric-card:nth-child(4n+3) { border-left-color: #06b6d4; }
@@ -169,7 +161,7 @@ st.markdown("""
         letter-spacing: 0.02em;
         transition: all 0.3s ease;
     }
-    .pill:hover { transform: scale(1.05); }
+    /* no hover on static pills */
     .pill-green  { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
     .pill-yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
     .pill-red    { background: rgba(239, 68, 68, 0.15);  color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25);  }
@@ -208,7 +200,7 @@ st.markdown("""
     /* Alternating row tints */
     .lb tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
     .lb tr:nth-child(odd) td  { background: rgba(255, 255, 255, 0.00); }
-    .lb tr:hover td { background: rgba(59, 130, 246, 0.08) !important; }
+    /* static data — no hover effects on rows */
     .lb .best  { color: #34d399; font-weight: 600; }
     .lb .worst { color: rgba(148, 163, 184, 0.4); }
     .lb .model-name { font-weight: 600; color: #f8fafc; }
@@ -221,24 +213,24 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
         transition: all 0.3s ease;
     }
-    .rank-badge:hover { transform: scale(1.15); }
+    /* no hover on static badges */
     .rk1 {
-        background: rgba(255, 215, 0, 0.15);
-        color: #FFD700;
-        border: 1px solid rgba(255, 215, 0, 0.35);
-        box-shadow: 0 0 12px rgba(255, 215, 0, 0.25), 0 0 4px rgba(255, 215, 0, 0.15);
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2), 0 0 4px rgba(16, 185, 129, 0.1);
     }
     .rk2 {
-        background: rgba(192, 192, 192, 0.12);
-        color: #C0C0C0;
-        border: 1px solid rgba(192, 192, 192, 0.3);
-        box-shadow: 0 0 10px rgba(192, 192, 192, 0.2), 0 0 4px rgba(192, 192, 192, 0.1);
+        background: rgba(148, 163, 184, 0.1);
+        color: #94a3b8;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        box-shadow: none;
     }
     .rk3 {
-        background: rgba(205, 127, 50, 0.15);
-        color: #CD7F32;
-        border: 1px solid rgba(205, 127, 50, 0.35);
-        box-shadow: 0 0 10px rgba(205, 127, 50, 0.2), 0 0 4px rgba(205, 127, 50, 0.1);
+        background: rgba(16, 185, 129, 0.08);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        box-shadow: none;
     }
     .rkn {
         background: rgba(148, 163, 184, 0.08);
@@ -261,10 +253,7 @@ st.markdown("""
         -webkit-backdrop-filter: blur(20px);
         transition: all 0.3s ease;
     }
-    .takeaway:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-left-width: 4px;
-    }
+    /* no hover on static takeaways */
     .takeaway strong { color: #f8fafc; }
 
     /* ── Cat badge ── */
@@ -276,7 +265,7 @@ st.markdown("""
         font-weight: 500;
         transition: all 0.3s ease;
     }
-    .cat-tag:hover { transform: scale(1.05); }
+    /* no hover on static tags */
 
     /* ── Bento Grid ── */
     .bento { display: grid; gap: 10px; }
