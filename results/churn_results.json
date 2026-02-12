@@ -1,0 +1,288 @@
+{
+  "dataset": "telco_churn",
+  "n_samples": 7043,
+  "n_features": 19,
+  "target_rate": 0.265,
+  "hardware": {
+    "cpu": "Apple M3 Pro",
+    "ram_gb": 18.0,
+    "os": "Darwin 25.2.0",
+    "python": "3.12.9"
+  },
+  "timestamp": "2026-02-12T03:35:34.441901+00:00",
+  "models": [
+    {
+      "name": "LightGBM (Default)",
+      "category": "gradient_boosting",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8337,
+        "log_loss": 0.4345,
+        "train_time_sec": 0.46,
+        "inference_time_ms_per_1k": 1.1,
+        "peak_memory_mb": 1.8
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.7926
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8098
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8142
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.823
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8353
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "scale_pos_weight"
+      }
+    },
+    {
+      "name": "LightGBM (Tuned)",
+      "category": "gradient_boosting",
+      "tuned": true,
+      "metrics": {
+        "auc_roc": 0.8315,
+        "log_loss": 0.4411,
+        "train_time_sec": 0.77,
+        "inference_time_ms_per_1k": 2.0,
+        "peak_memory_mb": 2.1
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8287
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8243
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8239
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8316
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8313
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "scale_pos_weight"
+      }
+    },
+    {
+      "name": "CatBoost (Default)",
+      "category": "gradient_boosting",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8436,
+        "log_loss": 0.4201,
+        "train_time_sec": 2.0,
+        "inference_time_ms_per_1k": 2.6,
+        "peak_memory_mb": 0.1
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8277
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8324
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8375
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8419
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8447
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "native",
+        "class_imbalance": "auto_class_weights"
+      }
+    },
+    {
+      "name": "CatBoost (Tuned)",
+      "category": "gradient_boosting",
+      "tuned": true,
+      "metrics": {
+        "auc_roc": 0.8472,
+        "log_loss": 0.4137,
+        "train_time_sec": 0.3,
+        "inference_time_ms_per_1k": 1.3,
+        "peak_memory_mb": 0.0
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8288
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8308
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.837
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8442
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.847
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "native",
+        "class_imbalance": "auto_class_weights"
+      }
+    },
+    {
+      "name": "FT-Transformer",
+      "category": "deep_learning",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8329,
+        "log_loss": 0.4352,
+        "train_time_sec": 75.28,
+        "inference_time_ms_per_1k": 71.2,
+        "peak_memory_mb": 22.4
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8279
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8276
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8245
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8416
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8387
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "needs_imputation",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "none"
+      }
+    },
+    {
+      "name": "AutoGluon",
+      "category": "automl",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8445,
+        "log_loss": 0.4174,
+        "train_time_sec": 31.18,
+        "inference_time_ms_per_1k": 16.5,
+        "peak_memory_mb": 146.6
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8289
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8342
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8401
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.841
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.844
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "native",
+        "class_imbalance": "native"
+      }
+    },
+    {
+      "name": "TabPFN",
+      "category": "foundation_model",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8495,
+        "log_loss": 0.4112,
+        "train_time_sec": 2.33,
+        "inference_time_ms_per_1k": 99935.3,
+        "peak_memory_mb": 31.0
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.8387
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8438
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8431
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8487
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8496
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "none"
+      }
+    }
+  ]
+}
