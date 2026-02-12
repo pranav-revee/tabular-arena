@@ -23,6 +23,13 @@ def load_results():
         return json.load(f)
 
 
+def _fmt_inference(ms_per_1k):
+    """Format inference time with adaptive units."""
+    if ms_per_1k >= 1000:
+        return f"{ms_per_1k / 1000:.1f}s/1k"
+    return f"{ms_per_1k:.1f}ms/1k"
+
+
 def _to_df(models):
     rows = []
     for m in models:
@@ -49,7 +56,7 @@ def _leaderboard(df):
         "Log Loss": ("{:.4f}", True),
         "Train Time (s)": ("{:.2f}s", True),
         "Memory (MB)": ("{:.0f}", True),
-        "Inference (ms/1k)": ("{:.1f}", True),
+        "Inference (ms/1k)": (None, True),  # uses adaptive formatter
     }
     best, worst = {}, {}
     for c, (_, lower) in cols.items():
@@ -66,7 +73,11 @@ def _leaderboard(df):
         cells = ""
         for c, (fmt, _) in cols.items():
             cls = "best" if r[c] == best[c] else ("worst" if r[c] == worst[c] else "")
-            cells += f'<td class="r {cls}">{fmt.format(r[c])}</td>'
+            if c == "Inference (ms/1k)":
+                val_str = _fmt_inference(r[c])
+            else:
+                val_str = fmt.format(r[c])
+            cells += f'<td class="r {cls}">{val_str}</td>'
 
         rows += (
             '<tr>'
@@ -85,7 +96,7 @@ def _leaderboard(df):
         + '<table class="lb"><thead><tr>'
         + '<th style="width:44px">#</th><th>Model</th>'
         + '<th class="r">AUC-ROC</th><th class="r">Log Loss</th>'
-        + '<th class="r">Time</th><th class="r">Memory</th><th class="r">Infer</th>'
+        + '<th class="r">Time</th><th class="r">Memory</th><th class="r">Inference</th>'
         + f'</tr></thead><tbody>{rows}</tbody></table></div>'
     )
 
@@ -277,6 +288,19 @@ def render():
         if len(smallest):
             bs = smallest.loc[smallest["AUC"].idxmax()]
             points.append(f"<strong>{bs['Model']}</strong> hits {bs['AUC']:.4f} AUC with just {int(bs['Samples'])} samples.")
+
+        # Check for tuned models that degrade at small sample sizes
+        for m in models:
+            if m.get("tuned") and m.get("scaling"):
+                sc = m["scaling"]
+                if len(sc) >= 2:
+                    small_auc = sc[0]["auc"]
+                    large_auc = sc[-1]["auc"]
+                    if large_auc - small_auc > 0.015:
+                        points.append(
+                            f"<strong>{m['name']}</strong> drops to {small_auc:.4f} at {sc[0]['n_samples']} samples — "
+                            f"tuned hyperparameters can overfit to dataset scale."
+                        )
 
     html = ""
     for i, p in enumerate(points):
