@@ -1,35 +1,25 @@
 """
-Tabular Arena — Design System & Configuration
-Modern 2026 aesthetic: deep darks, vibrant accents, glass surfaces.
+Tabular Arena — Material Design 3 Dark Theme Configuration
 """
 
-# ── Color Palette ───────────────────────────────────────────────────────────
-# Curated via Coolors — cohesive, accessible on white backgrounds.
-# Primary hues: Teal (boosting), Indigo (automl), Violet (foundation), Amber (deep learning)
+# ── Material Color Tokens ──────────────────────────────────────────────────
+PRIMARY = "#BB86FC"
+PRIMARY_VARIANT = "#7C4DFF"
+SECONDARY = "#03DAC6"
+ERROR = "#CF6679"
+ON_BG = "#E8EAED"
+ON_SURFACE = "#BDC1C6"
+MUTED = "#9AA0A6"
 
-TEAL       = "#0d9488"     # gradient boosting
-TEAL_LIGHT = "#ccfbf1"     # teal bg tint
-INDIGO       = "#4f46e5"   # automl
-INDIGO_LIGHT = "#e0e7ff"   # indigo bg tint
-VIOLET       = "#7c3aed"   # foundation model
-VIOLET_LIGHT = "#ede9fe"   # violet bg tint
-AMBER       = "#d97706"    # deep learning
-AMBER_LIGHT = "#fef3c7"    # amber bg tint
-
-# Semantic
-GREEN  = "#059669"
-RED    = "#dc2626"
-GRAY   = "#6b7280"
-
-# ── Model Colors (consistent across all charts) ────────────────────────────
+# ── Model Colors ───────────────────────────────────────────────────────────
 MODEL_COLORS = {
-    "LightGBM (Default)":  "#00d4aa",
-    "LightGBM (Tuned)":    "#00b894",
-    "CatBoost (Default)":  "#00cec9",
-    "CatBoost (Tuned)":    "#00b4d8",
-    "AutoGluon":           "#6c5ce7",
-    "TabPFN":              "#a855f7",
-    "FT-Transformer":      "#f59e0b",
+    "LightGBM (Default)":  "#03DAC6",
+    "LightGBM (Tuned)":    "#00BFA5",
+    "CatBoost (Default)":  "#80CBC4",
+    "CatBoost (Tuned)":    "#4DB6AC",
+    "AutoGluon":           "#BB86FC",
+    "TabPFN":              "#FF7597",
+    "FT-Transformer":      "#FFB74D",
 }
 
 MODEL_CATEGORIES = {
@@ -43,17 +33,17 @@ MODEL_CATEGORIES = {
 }
 
 CATEGORY_COLORS = {
-    "Gradient Boosting": "#00d4aa",
-    "AutoML":            "#6c5ce7",
-    "Foundation Model":  "#a855f7",
-    "Deep Learning":     "#f59e0b",
+    "Gradient Boosting": "#03DAC6",
+    "AutoML":            "#BB86FC",
+    "Foundation Model":  "#FF7597",
+    "Deep Learning":     "#FFB74D",
 }
 
 CATEGORY_BG = {
-    "Gradient Boosting": "rgba(0,212,170,0.15)",
-    "AutoML":            "rgba(108,92,231,0.15)",
-    "Foundation Model":  "rgba(168,85,247,0.15)",
-    "Deep Learning":     "rgba(245,158,11,0.15)",
+    "Gradient Boosting": "rgba(3,218,198,0.12)",
+    "AutoML":            "rgba(187,134,252,0.12)",
+    "Foundation Model":  "rgba(255,117,151,0.12)",
+    "Deep Learning":     "rgba(255,183,77,0.12)",
 }
 
 CATEGORY_ICONS = {
@@ -126,36 +116,36 @@ AUTHOR_NAME = "Pranav Reveendran"
 GITHUB_URL = ""
 LINKEDIN_URL = ""
 
-# ── Plotly Chart Theme (Dark) ───────────────────────────────────────────────
+# ── Plotly Chart Theme ─────────────────────────────────────────────────────
 PLOTLY_LAYOUT = dict(
     template="plotly_dark",
     plot_bgcolor="rgba(0,0,0,0)",
     paper_bgcolor="rgba(0,0,0,0)",
-    font=dict(family="Inter, system-ui, -apple-system, sans-serif", color="#94a3b8", size=12),
-    title_font=dict(size=14, color="#f8fafc"),
+    font=dict(family="Inter, system-ui, sans-serif", color="#9AA0A6", size=12),
+    title_font=dict(size=14, color="#E8EAED"),
     legend=dict(
         orientation="h",
         yanchor="bottom", y=1.05,
         xanchor="right", x=1,
         bgcolor="rgba(0,0,0,0)",
-        font=dict(size=11, color="#94a3b8"),
+        font=dict(size=11, color="#9AA0A6"),
     ),
     xaxis=dict(
         gridcolor="rgba(255,255,255,0.06)",
         zerolinecolor="rgba(255,255,255,0.1)",
-        tickfont=dict(size=11, color="#64748b"),
-        linecolor="rgba(255,255,255,0.1)",
+        tickfont=dict(size=11, color="#5F6368"),
+        linecolor="rgba(255,255,255,0.06)",
     ),
     yaxis=dict(
         gridcolor="rgba(255,255,255,0.06)",
         zerolinecolor="rgba(255,255,255,0.1)",
-        tickfont=dict(size=11, color="#64748b"),
-        linecolor="rgba(255,255,255,0.1)",
+        tickfont=dict(size=11, color="#5F6368"),
+        linecolor="rgba(255,255,255,0.06)",
     ),
     margin=dict(l=60, r=20, t=50, b=50),
     hoverlabel=dict(
-        bgcolor="#1e293b",
+        bgcolor="#1F1F1F",
         bordercolor="rgba(255,255,255,0.1)",
-        font=dict(size=12, color="#f8fafc"),
+        font=dict(size=12, color="#E8EAED"),
     ),
 )

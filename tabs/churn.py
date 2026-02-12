@@ -6,9 +6,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from pathlib import Path
-from config import MODEL_COLORS, CATEGORY_COLORS, CATEGORY_BG, MODEL_CATEGORIES, DEFAULT_MODELS, TUNED_MODELS, PLOTLY_LAYOUT
+from config import (
+    MODEL_COLORS, CATEGORY_COLORS, CATEGORY_BG, MODEL_CATEGORIES,
+    DEFAULT_MODELS, TUNED_MODELS, PLOTLY_LAYOUT, DATASET_INFO,
+)
 
 RESULTS_PATH = Path(__file__).parent.parent / "results" / "churn_results.json"
+DS = DATASET_INFO["telco_churn"]
 
 
 @st.cache_data
@@ -62,28 +66,27 @@ def _leaderboard(df):
         cells = ""
         for c, (fmt, _) in cols.items():
             cls = "best" if r[c] == best[c] else ("worst" if r[c] == worst[c] else "")
-            wcol = ' style="color:#475569;"' if cls == "worst" else ""
-            cells += f'<td class="r {cls}"{wcol}>{fmt.format(r[c])}</td>'
+            cells += f'<td class="r {cls}">{fmt.format(r[c])}</td>'
 
         rows += (
-            f'<tr>'
-            f'<td><span class="rank-badge {rcls}">{rank}</span></td>'
-            f'<td><div style="display:flex;align-items:center;gap:10px;">'
-            f'<div style="width:3px;height:22px;border-radius:2px;background:{color};"></div>'
-            f'<div><div class="model-name" style="color:#f8fafc;">{r["Model"]}</div>'
-            f'<div style="font-size:0.7rem;color:{cat_color};">{r["Category"]}</div></div>'
-            f'</div></td>'
-            f'{cells}'
-            f'</tr>'
+            '<tr>'
+            + f'<td><span class="rank-badge {rcls}">{rank}</span></td>'
+            + f'<td><div style="display:flex;align-items:center;gap:10px;">'
+            + f'<div style="width:3px;height:22px;border-radius:2px;background:{color};"></div>'
+            + f'<div><div class="model-name">{r["Model"]}</div>'
+            + f'<div style="font-size:0.7rem;color:{cat_color};">{r["Category"]}</div></div>'
+            + '</div></td>'
+            + cells
+            + '</tr>'
         )
 
     return (
         '<div class="card" style="padding:0;overflow:hidden;">'
-        '<table class="lb"><thead><tr>'
-        '<th style="width:44px">#</th><th>Model</th>'
-        '<th class="r">AUC-ROC</th><th class="r">Log Loss</th>'
-        '<th class="r">Time</th><th class="r">Memory</th><th class="r">Infer</th>'
-        f'</tr></thead><tbody>{rows}</tbody></table></div>'
+        + '<table class="lb"><thead><tr>'
+        + '<th style="width:44px">#</th><th>Model</th>'
+        + '<th class="r">AUC-ROC</th><th class="r">Log Loss</th>'
+        + '<th class="r">Time</th><th class="r">Memory</th><th class="r">Infer</th>'
+        + f'</tr></thead><tbody>{rows}</tbody></table></div>'
     )
 
 
@@ -109,30 +112,48 @@ def _handling(models, df):
             return f'<span class="pill {cls}">{lbl}</span>'
 
         rows += (
-            f'<tr>'
-            f'<td><div style="display:flex;align-items:center;gap:8px;">'
-            f'<div style="width:3px;height:18px;border-radius:2px;background:{color};"></div>'
-            f'<span class="model-name" style="font-size:0.83rem;color:#e2e8f0;">{m["name"]}</span>'
-            f'</div></td>'
-            f'<td>{pill("missing_values")}</td>'
-            f'<td>{pill("categorical_features")}</td>'
-            f'<td>{pill("class_imbalance")}</td>'
-            f'</tr>'
+            '<tr>'
+            + f'<td><div style="display:flex;align-items:center;gap:8px;">'
+            + f'<div style="width:3px;height:18px;border-radius:2px;background:{color};"></div>'
+            + f'<span class="model-name" style="font-size:0.83rem;">{m["name"]}</span>'
+            + '</div></td>'
+            + f'<td>{pill("missing_values")}</td>'
+            + f'<td>{pill("categorical_features")}</td>'
+            + f'<td>{pill("class_imbalance")}</td>'
+            + '</tr>'
         )
 
     return (
         '<div class="card" style="padding:0;overflow:hidden;">'
-        '<table class="lb"><thead><tr>'
-        '<th>Model</th><th>Missing Values</th><th>Categoricals</th><th>Class Imbalance</th>'
-        f'</tr></thead><tbody>{rows}</tbody></table></div>'
+        + '<table class="lb"><thead><tr>'
+        + '<th>Model</th><th>Missing Values</th><th>Categoricals</th><th>Class Imbalance</th>'
+        + f'</tr></thead><tbody>{rows}</tbody></table></div>'
     )
 
 
 def render():
     data = load_results()
     if data is None:
-        st.markdown('<div style="text-align:center;padding:4rem;color:#64748b;">No results yet.</div>', unsafe_allow_html=True)
+        st.markdown('<div style="text-align:center;padding:4rem;color:#5F6368;">No results yet — run benchmarks/run_churn.py first.</div>', unsafe_allow_html=True)
         return
+
+    # Dataset stats bar
+    st.markdown(
+        f'<div style="margin-bottom:8px;">'
+        f'<div style="font-size:1.2rem;font-weight:700;color:#E8EAED;">{DS["icon"]} {DS["name"]}</div>'
+        f'<div style="color:#9AA0A6;font-size:0.84rem;margin-top:4px;">{DS["description"]}</div>'
+        f'</div>'
+        f'<div class="ds-stats">'
+        f'<div class="ds-stat"><div class="ds-stat-val">{DS["n_samples"]:,}</div><div class="ds-stat-lbl">Samples</div></div>'
+        f'<div class="ds-stat"><div class="ds-stat-val">{DS["n_features"]}</div><div class="ds-stat-lbl">Features</div></div>'
+        f'<div class="ds-stat"><div class="ds-stat-val">{DS["target_rate"]:.1%}</div><div class="ds-stat-lbl">Positive Rate</div></div>'
+        f'<div class="ds-stat"><div class="ds-stat-val">{DS["task"]}</div><div class="ds-stat-lbl">Task</div></div>'
+        f'<div class="ds-stat"><div class="ds-stat-val">{DS["source"]}</div><div class="ds-stat-lbl">Source</div></div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<hr class="soft-divider" style="margin:1rem 0 1.5rem 0;">', unsafe_allow_html=True)
 
     # Toggle
     c1, c2 = st.columns([1, 4])
@@ -160,7 +181,7 @@ def render():
         f'<div class="bento bento-3" style="margin:1rem 0 2rem 0;">'
         + mc(f"Best AUC · {label}", f"{top['AUC-ROC']:.4f}", top["Model"])
         + mc("Fastest", f"{fast['Train Time (s)']:.1f}s", fast["Model"])
-        + mc("Lightest", f'{light["Memory (MB)"]:.0f}<span style="font-size:0.9rem;color:#64748b;">MB</span>', light["Model"])
+        + mc("Lightest", f'{light["Memory (MB)"]:.0f}<span style="font-size:0.9rem;color:#5F6368;">MB</span>', light["Model"])
         + '</div>',
         unsafe_allow_html=True,
     )
@@ -174,7 +195,7 @@ def render():
 
     # Money Chart
     st.markdown('<div class="section-header">Accuracy vs Speed</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-caption">What\'s accurate AND fast? Bottom-right is the sweet spot.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-caption">Bottom-right is the sweet spot — accurate AND fast.</div>', unsafe_allow_html=True)
 
     fig = px.scatter(
         df, x="Train Time (s)", y="AUC-ROC", size="Memory (MB)",
@@ -186,14 +207,14 @@ def render():
     fig.update_layout(**PLOTLY_LAYOUT, height=460,
                       xaxis_title="Training Time (log scale)",
                       yaxis_title="AUC-ROC")
-    fig.update_traces(marker=dict(line=dict(width=1.5, color="#fff")))
+    fig.update_traces(marker=dict(line=dict(width=1.5, color="rgba(255,255,255,0.3)")))
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown('<hr class="soft-divider">', unsafe_allow_html=True)
 
     # Scaling
     st.markdown('<div class="section-header">Data Efficiency</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-caption">AUC vs training set size &mdash; who learns faster from less data?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-caption">AUC vs training set size — who learns faster from less data?</div>', unsafe_allow_html=True)
 
     sc_rows = []
     for m in models:
@@ -211,7 +232,7 @@ def render():
                 x=[r["Samples"] for r in md], y=[r["AUC"] for r in md],
                 name=name, mode="lines+markers",
                 line=dict(color=color, width=2.5),
-                marker=dict(size=6, color=color, line=dict(width=1.5, color="#fff")),
+                marker=dict(size=6, color=color, line=dict(width=1.5, color="rgba(255,255,255,0.3)")),
                 hovertemplate=f"<b>{name}</b><br>%{{x:,}} samples<br>AUC: %{{y:.4f}}<extra></extra>",
             ))
         fig2.update_layout(**PLOTLY_LAYOUT, height=420,
@@ -240,7 +261,7 @@ def render():
     fm_auc = fm["AUC-ROC"].max() if len(fm) else 0
     gb_auc = gb["AUC-ROC"].max() if len(gb) else 0
 
-    accent = ["#a855f7", "#3b82f6", "#00d4aa", "#f59e0b"]
+    accent = ["#BB86FC", "#03DAC6", "#FF7597", "#FFB74D"]
     points = [
         f"<strong>{best_name}</strong> leads at <strong>{best_auc:.4f}</strong> AUC.",
         f"<strong>{fast_name}</strong> trains in <strong>{fast_time:.1f}s</strong>.",
@@ -257,9 +278,9 @@ def render():
             bs = smallest.loc[smallest["AUC"].idxmax()]
             points.append(f"<strong>{bs['Model']}</strong> hits {bs['AUC']:.4f} AUC with just {int(bs['Samples'])} samples.")
 
-    html = '<style>.takeaway strong{color:#e2e8f0;}</style>'
+    html = ""
     for i, p in enumerate(points):
-        html += f'<div class="takeaway" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:3px solid {accent[i % 4]};color:#94a3b8;">{p}</div>'
+        html += f'<div class="takeaway" style="border-left-color:{accent[i % 4]};">{p}</div>'
     st.markdown(html, unsafe_allow_html=True)
 
     # Download
