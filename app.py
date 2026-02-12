@@ -395,8 +395,6 @@ if LINKEDIN_URL:
     links.append(f'<a href="{LINKEDIN_URL}" target="_blank">LinkedIn</a>')
 sep = " · ".join(links)
 
-st.markdown(f"""
-<div class="site-footer">
-    Built by {AUTHOR_NAME}{f' · {sep}' if sep else ''}
-</div>
-""", unsafe_allow_html=True)
+st.markdown(f"""<div class="site-footer">
+Built by {AUTHOR_NAME}{f' · {sep}' if sep else ''}
+</div>""", unsafe_allow_html=True)
