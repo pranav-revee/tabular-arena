@@ -530,11 +530,12 @@ export function CreditRiskTab() {
             <span className="text-sky-400 mt-0.5">→</span>
             <p className="text-zinc-300 text-sm leading-relaxed">
               <strong className="text-zinc-100">
-                FT-Transformer collapses on sparse, high-dim data
+                FT-Transformer collapses — but it's a preprocessing issue
               </strong>{' '}
-              — 0.6289 AUC is near-random on 302 features with heavy NaN rates.
-              Deep learning needs dense, clean features to compete with GBDT on
-              tabular tasks.
+              — 0.6289 AUC with simple median imputation on 302 sparse features.
+              The per-feature linear embeddings can't handle heavy missingness
+              or raw categoricals. A fairer test would need proper NaN masking
+              and learned categorical embeddings.
             </p>
           </div>
           <div className="flex gap-3 items-start">
