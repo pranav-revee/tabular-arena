@@ -14,25 +14,24 @@ import {
   Bar,
   Cell,
 } from 'recharts'
-import { creditData, CREDIT_MODEL_COLORS } from '../data/credit'
-import { CATEGORY_COLORS, CATEGORY_LABELS } from '../data/churn'
+import {
+  churnData,
+  MODEL_COLORS,
+  CATEGORY_COLORS,
+  CATEGORY_LABELS,
+} from '../data/churn'
 
 // Sort models by AUC descending
-const sortedModels = [...creditData.models].sort(
+const sortedModels = [...churnData.models].sort(
   (a, b) => b.metrics.auc_roc - a.metrics.auc_roc
 )
 
-// All unique sample sizes across models
-const allSampleSizes = [
-  ...new Set(creditData.models.flatMap((m) => m.scaling.map((s) => s.n_samples))),
-].sort((a, b) => a - b)
-
-// Prepare scaling data — models with missing points get undefined (gap in line)
-const scalingData = allSampleSizes.map((n) => {
-  const point: Record<string, number | undefined> = { n_samples: n }
-  creditData.models.forEach((m) => {
-    const match = m.scaling.find((sc) => sc.n_samples === n)
-    point[m.name] = match?.auc
+// Prepare scaling data for recharts
+const scalingData = churnData.models[0].scaling.map((s) => {
+  const point: Record<string, number> = { n_samples: s.n_samples }
+  churnData.models.forEach((m) => {
+    const match = m.scaling.find((sc) => sc.n_samples === s.n_samples)
+    if (match) point[m.name] = match.auc
   })
   return point
 })
@@ -115,13 +114,13 @@ const TimeBarTooltip = ({ active, payload }: any) => {
   return null
 }
 
-export function CreditRiskTab() {
+export function ChurnTab() {
   const [hoveredModel, setHoveredModel] = useState<string | null>(null)
   const best = sortedModels[0]
-  const fastest = [...creditData.models].sort(
+  const fastest = [...churnData.models].sort(
     (a, b) => a.metrics.train_time_sec - b.metrics.train_time_sec
   )[0]
-  const lightest = [...creditData.models].sort(
+  const lightest = [...churnData.models].sort(
     (a, b) => a.metrics.peak_memory_mb - b.metrics.peak_memory_mb
   )[0]
 
@@ -140,13 +139,13 @@ export function CreditRiskTab() {
         </div>
         <div>
           <h2 className="text-3xl font-bold text-zinc-100 tracking-tight">
-            Home Credit Default Risk
+            Telco Customer Churn
           </h2>
           <p className="text-zinc-500 mt-1 font-mono text-sm">
-            {creditData.n_samples.toLocaleString()} rows ·{' '}
-            {creditData.n_features} features ·{' '}
-            {(creditData.target_rate * 100).toFixed(1)}% positive · Kaggle
-            Competition
+            {churnData.n_samples.toLocaleString()} rows ·{' '}
+            {churnData.n_features} features ·{' '}
+            {(churnData.target_rate * 100).toFixed(1)}% positive · Kaggle (IBM
+            Sample)
           </p>
         </div>
       </div>
@@ -181,7 +180,9 @@ export function CreditRiskTab() {
           <span className="text-2xl font-bold font-mono text-zinc-100">
             {fastest.metrics.train_time_sec}s
           </span>
-          <span className="text-sm text-emerald-400 ml-2">{fastest.name}</span>
+          <span className="text-sm text-emerald-400 ml-2">
+            {fastest.name}
+          </span>
         </div>
 
         <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-5 border-l-4 border-l-sky-500">
@@ -258,22 +259,17 @@ export function CreditRiskTab() {
                       <span
                         className="w-2 h-2 rounded-full"
                         style={{
-                          background: CREDIT_MODEL_COLORS[model.name],
+                          background: MODEL_COLORS[model.name],
                         }}
                       />
                       <span className="text-zinc-200 font-medium">
                         {model.name}
                       </span>
-                      {model.tuned && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                          tuned
-                        </span>
-                      )}
                     </div>
                   </td>
                   <td className="px-6 py-3.5">
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full border ${CATEGORY_COLORS[model.category]}`}
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${CATEGORY_COLORS[model.category]}`}
                     >
                       {CATEGORY_LABELS[model.category]}
                     </span>
@@ -282,7 +278,7 @@ export function CreditRiskTab() {
                     <span
                       className={
                         i === 0
-                          ? 'text-amber-400 font-bold'
+                          ? 'text-rose-400 font-bold'
                           : 'text-zinc-300'
                       }
                     >
@@ -322,7 +318,7 @@ export function CreditRiskTab() {
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-6">
             AUC-ROC Comparison
           </h3>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart
               data={aucBarData}
               layout="vertical"
@@ -335,7 +331,7 @@ export function CreditRiskTab() {
               />
               <XAxis
                 type="number"
-                domain={[0.74, 0.79]}
+                domain={[0.81, 0.85]}
                 tick={{ fill: '#71717a', fontSize: 11 }}
                 tickFormatter={(v: number) => v.toFixed(2)}
                 axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
@@ -356,7 +352,7 @@ export function CreditRiskTab() {
                 {aucBarData.map((entry) => (
                   <Cell
                     key={entry.fullName}
-                    fill={CREDIT_MODEL_COLORS[entry.fullName]}
+                    fill={MODEL_COLORS[entry.fullName]}
                     fillOpacity={0.8}
                   />
                 ))}
@@ -375,7 +371,7 @@ export function CreditRiskTab() {
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-6">
             Training Time (seconds)
           </h3>
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart
               data={timeBarData}
               layout="vertical"
@@ -407,7 +403,7 @@ export function CreditRiskTab() {
                 {timeBarData.map((entry) => (
                   <Cell
                     key={entry.fullName}
-                    fill={CREDIT_MODEL_COLORS[entry.fullName]}
+                    fill={MODEL_COLORS[entry.fullName]}
                     fillOpacity={0.8}
                   />
                 ))}
@@ -439,11 +435,11 @@ export function CreditRiskTab() {
             <XAxis
               dataKey="n_samples"
               tick={{ fill: '#71717a', fontSize: 11 }}
-              tickFormatter={(v: number) => v >= 1000 ? `${v / 1000}k` : String(v)}
+              tickFormatter={(v: number) => v.toLocaleString()}
               axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
             />
             <YAxis
-              domain={[0.68, 0.8]}
+              domain={[0.78, 0.85]}
               tick={{ fill: '#71717a', fontSize: 11 }}
               tickFormatter={(v: number) => v.toFixed(2)}
               axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
@@ -458,16 +454,15 @@ export function CreditRiskTab() {
                 <span className="text-zinc-400 text-xs">{value}</span>
               )}
             />
-            {creditData.models.map((model) => (
+            {churnData.models.map((model) => (
               <Line
                 key={model.name}
                 type="monotone"
                 dataKey={model.name}
-                stroke={CREDIT_MODEL_COLORS[model.name]}
+                stroke={MODEL_COLORS[model.name]}
                 strokeWidth={2}
-                dot={{ r: 3, strokeWidth: 0, fill: CREDIT_MODEL_COLORS[model.name] }}
+                dot={{ r: 3, strokeWidth: 0, fill: MODEL_COLORS[model.name] }}
                 activeDot={{ r: 5, strokeWidth: 2, stroke: '#0a0f1a' }}
-                connectNulls={false}
               />
             ))}
           </LineChart>
@@ -488,53 +483,42 @@ export function CreditRiskTab() {
           <div className="flex gap-3 items-start">
             <span className="text-amber-400 mt-0.5">→</span>
             <p className="text-zinc-300 text-sm leading-relaxed">
-              <strong className="text-zinc-100">AutoGluon edges out the field</strong>{' '}
-              with 0.7857 AUC-ROC, but at enormous cost — 650s training and 2.6 GB RAM.
-              XGBoost (Tuned) matches at 0.7844 in 180s, making it the better
-              production choice.
-            </p>
-          </div>
-          <div className="flex gap-3 items-start">
-            <span className="text-indigo-400 mt-0.5">→</span>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              <strong className="text-zinc-100">
-                Tuning is critical on high-dimensional data
-              </strong>{' '}
-              — XGBoost jumps from 0.7551 → 0.7844 (+3.9%) with Optuna.
-              On 302 features with heavy missingness, default hyperparameters
-              leave significant performance on the table.
+              <strong className="text-zinc-100">AutoGluon wins with 0.8445 AUC</strong>{' '}
+              — its ensemble stacking edges out all individual GBDT models. At
+              9.5s training, it's a strong choice when you can afford the 388 MB
+              memory footprint.
             </p>
           </div>
           <div className="flex gap-3 items-start">
             <span className="text-emerald-400 mt-0.5">→</span>
             <p className="text-zinc-300 text-sm leading-relaxed">
               <strong className="text-zinc-100">
-                CatBoost shines out of the box
+                CatBoost Default is the production pick
               </strong>{' '}
-              — 0.7798 AUC with zero tuning, native categorical handling, and
-              automatic class weighting. Best default-config model by a wide margin.
+              — 0.8436 AUC (only 0.0009 behind AutoGluon) with 1.9s training,
+              zero tuning effort, and native categorical handling. Best
+              accuracy-to-effort ratio.
+            </p>
+          </div>
+          <div className="flex gap-3 items-start">
+            <span className="text-indigo-400 mt-0.5">→</span>
+            <p className="text-zinc-300 text-sm leading-relaxed">
+              <strong className="text-zinc-100">
+                XGBoost benefits most from tuning
+              </strong>{' '}
+              — jumps from 0.8187 → 0.8383 (+2.4%) with Optuna, the largest
+              gain of any model. Default XGBoost is the weakest contender.
             </p>
           </div>
           <div className="flex gap-3 items-start">
             <span className="text-rose-400 mt-0.5">→</span>
             <p className="text-zinc-300 text-sm leading-relaxed">
               <strong className="text-zinc-100">
-                TabPFN hits its ceiling at scale
+                Tuning hurts on small data
               </strong>{' '}
-              — scaling stops at 50k samples (0.7733) and can't leverage the full
-              307k dataset. Its 6s/1k inference and 1.2 GB memory make it
-              impractical for production credit scoring.
-            </p>
-          </div>
-          <div className="flex gap-3 items-start">
-            <span className="text-violet-400 mt-0.5">→</span>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              <strong className="text-zinc-100">
-                Data volume matters more than model choice
-              </strong>{' '}
-              — every GBDT model gains 6–8% AUC going from 1k to 245k samples.
-              The scaling curves show no signs of saturation, suggesting even
-              more data would help.
+              — both LightGBM and CatBoost got <em>worse</em> after Optuna
+              (0.8214 vs 0.8337, 0.8313 vs 0.8436), suggesting hyperparameter
+              search overfits on 7k rows with only 5 CV folds.
             </p>
           </div>
         </div>

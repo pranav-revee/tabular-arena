@@ -33,7 +33,7 @@ export const creditData = {
         log_loss: 0.2371,
         train_time_sec: 180.1,
         inference_time_ms_per_1k: 1.8,
-        peak_memory_mb: 0.0,
+        peak_memory_mb: 108.6,
       },
       scaling: [
         { n_samples: 1000, auc: 0.7009 },
@@ -93,7 +93,7 @@ export const creditData = {
         log_loss: 0.2372,
         train_time_sec: 904.04,
         inference_time_ms_per_1k: 3.4,
-        peak_memory_mb: 0.2,
+        peak_memory_mb: 1.3,
       },
       scaling: [
         { n_samples: 1000, auc: 0.7029 },
@@ -140,26 +140,6 @@ export const creditData = {
         { n_samples: 50000, auc: 0.774 },
       ],
     },
-    {
-      name: 'FT-Transformer',
-      category: 'deep_learning',
-      tuned: false,
-      metrics: {
-        auc_roc: 0.6289,
-        log_loss: 0.2731,
-        train_time_sec: 474.11,
-        inference_time_ms_per_1k: 8.4,
-        peak_memory_mb: 23.3,
-      },
-      scaling: [
-        { n_samples: 1000, auc: 0.4875 },
-        { n_samples: 5000, auc: 0.5146 },
-        { n_samples: 20000, auc: 0.5308 },
-        { n_samples: 50000, auc: 0.5531 },
-        { n_samples: 150000, auc: 0.5981 },
-        { n_samples: 245000, auc: 0.5878 },
-      ],
-    },
   ],
 }
 
@@ -167,10 +147,8 @@ export const CREDIT_MODEL_COLORS: Record<string, string> = {
   'XGBoost (Default)': '#6366f1',
   'XGBoost (Tuned)': '#818cf8',
   'CatBoost (Default)': '#22c55e',
-  'CatBoost (Tuned)': '#4ade80',
   'LightGBM (Default)': '#10b981',
   'LightGBM (Tuned)': '#34d399',
-  'FT-Transformer': '#0ea5e9',
   AutoGluon: '#f59e0b',
   TabPFN: '#f43f5e',
 }
