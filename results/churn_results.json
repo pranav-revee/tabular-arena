@@ -9,7 +9,7 @@
     "os": "Darwin 25.2.0",
     "python": "3.12.9"
   },
-  "timestamp": "2026-02-12T03:35:34.441901+00:00",
+  "timestamp": "2026-02-12T07:51:04.732175+00:00",
   "models": [
     {
       "name": "LightGBM (Default)",
@@ -18,9 +18,9 @@
       "metrics": {
         "auc_roc": 0.8337,
         "log_loss": 0.4345,
-        "train_time_sec": 0.46,
+        "train_time_sec": 0.45,
         "inference_time_ms_per_1k": 1.1,
-        "peak_memory_mb": 1.8
+        "peak_memory_mb": 9.5
       },
       "scaling": [
         {
@@ -55,32 +55,34 @@
       "category": "gradient_boosting",
       "tuned": true,
       "metrics": {
-        "auc_roc": 0.8315,
-        "log_loss": 0.4411,
-        "train_time_sec": 0.77,
-        "inference_time_ms_per_1k": 2.0,
-        "peak_memory_mb": 2.1
+        "auc_roc": 0.8214,
+        "log_loss": 0.4832,
+        "train_time_sec": 31.37,
+        "inference_time_ms_per_1k": 9.3,
+        "peak_memory_mb": 14.3,
+        "search_time_sec": 28.41,
+        "fit_time_sec": 2.96
       },
       "scaling": [
         {
           "n_samples": 500,
-          "auc": 0.8287
+          "auc": 0.8128
         },
         {
           "n_samples": 1000,
-          "auc": 0.8243
+          "auc": 0.8155
         },
         {
           "n_samples": 2000,
-          "auc": 0.8239
+          "auc": 0.8095
         },
         {
           "n_samples": 3500,
-          "auc": 0.8316
+          "auc": 0.815
         },
         {
           "n_samples": 5600,
-          "auc": 0.8313
+          "auc": 0.8152
         }
       ],
       "raw_data_handling": {
@@ -96,9 +98,9 @@
       "metrics": {
         "auc_roc": 0.8436,
         "log_loss": 0.4201,
-        "train_time_sec": 2.0,
-        "inference_time_ms_per_1k": 2.6,
-        "peak_memory_mb": 0.1
+        "train_time_sec": 1.9,
+        "inference_time_ms_per_1k": 2.1,
+        "peak_memory_mb": 152.5
       },
       "scaling": [
         {
@@ -133,32 +135,34 @@
       "category": "gradient_boosting",
       "tuned": true,
       "metrics": {
-        "auc_roc": 0.8472,
-        "log_loss": 0.4137,
-        "train_time_sec": 0.3,
-        "inference_time_ms_per_1k": 1.3,
-        "peak_memory_mb": 0.0
+        "auc_roc": 0.8313,
+        "log_loss": 0.4601,
+        "train_time_sec": 59.07,
+        "inference_time_ms_per_1k": 1.6,
+        "peak_memory_mb": 1.3,
+        "search_time_sec": 57.6,
+        "fit_time_sec": 1.47
       },
       "scaling": [
         {
           "n_samples": 500,
-          "auc": 0.8288
+          "auc": 0.8028
         },
         {
           "n_samples": 1000,
-          "auc": 0.8308
+          "auc": 0.8061
         },
         {
           "n_samples": 2000,
-          "auc": 0.837
+          "auc": 0.8126
         },
         {
           "n_samples": 3500,
-          "auc": 0.8442
+          "auc": 0.8232
         },
         {
           "n_samples": 5600,
-          "auc": 0.847
+          "auc": 0.8292
         }
       ],
       "raw_data_handling": {
@@ -168,42 +172,83 @@
       }
     },
     {
-      "name": "FT-Transformer",
-      "category": "deep_learning",
+      "name": "XGBoost (Default)",
+      "category": "gradient_boosting",
       "tuned": false,
       "metrics": {
-        "auc_roc": 0.8329,
-        "log_loss": 0.4352,
-        "train_time_sec": 75.28,
-        "inference_time_ms_per_1k": 71.2,
-        "peak_memory_mb": 22.4
+        "auc_roc": 0.8187,
+        "log_loss": 0.4691,
+        "train_time_sec": 0.14,
+        "inference_time_ms_per_1k": 2.0,
+        "peak_memory_mb": 7.6
       },
       "scaling": [
         {
           "n_samples": 500,
-          "auc": 0.8279
+          "auc": 0.7817
         },
         {
           "n_samples": 1000,
-          "auc": 0.8276
+          "auc": 0.7993
         },
         {
           "n_samples": 2000,
-          "auc": 0.8245
+          "auc": 0.8024
         },
         {
           "n_samples": 3500,
-          "auc": 0.8416
+          "auc": 0.8058
         },
         {
           "n_samples": 5600,
-          "auc": 0.8387
+          "auc": 0.8207
         }
       ],
       "raw_data_handling": {
-        "missing_values": "needs_imputation",
+        "missing_values": "native",
         "categorical_features": "needs_encoding",
-        "class_imbalance": "none"
+        "class_imbalance": "scale_pos_weight"
+      }
+    },
+    {
+      "name": "XGBoost (Tuned)",
+      "category": "gradient_boosting",
+      "tuned": true,
+      "metrics": {
+        "auc_roc": 0.8383,
+        "log_loss": 0.4235,
+        "train_time_sec": 12.43,
+        "inference_time_ms_per_1k": 1.6,
+        "peak_memory_mb": 7.6,
+        "search_time_sec": 11.97,
+        "fit_time_sec": 0.46
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.7941
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.8052
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.8182
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8326
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8416
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "scale_pos_weight"
       }
     },
     {
@@ -213,9 +258,9 @@
       "metrics": {
         "auc_roc": 0.8445,
         "log_loss": 0.4174,
-        "train_time_sec": 31.18,
-        "inference_time_ms_per_1k": 16.5,
-        "peak_memory_mb": 146.6
+        "train_time_sec": 9.54,
+        "inference_time_ms_per_1k": 13.5,
+        "peak_memory_mb": 388.5
       },
       "scaling": [
         {
@@ -250,36 +295,75 @@
       "category": "foundation_model",
       "tuned": false,
       "metrics": {
-        "auc_roc": 0.8495,
-        "log_loss": 0.4112,
-        "train_time_sec": 2.33,
-        "inference_time_ms_per_1k": 99935.3,
-        "peak_memory_mb": 31.0
+        "auc_roc": 0.8404,
+        "log_loss": 0.4228,
+        "train_time_sec": 6.7,
+        "inference_time_ms_per_1k": 1280.0,
+        "peak_memory_mb": 612.3
       },
       "scaling": [
         {
           "n_samples": 500,
-          "auc": 0.8387
+          "auc": 0.8184
         },
         {
           "n_samples": 1000,
-          "auc": 0.8438
+          "auc": 0.8301
         },
         {
           "n_samples": 2000,
-          "auc": 0.8431
+          "auc": 0.8367
         },
         {
           "n_samples": 3500,
-          "auc": 0.8487
+          "auc": 0.8392
         },
         {
           "n_samples": 5600,
-          "auc": 0.8496
+          "auc": 0.8408
         }
       ],
       "raw_data_handling": {
         "missing_values": "native",
+        "categorical_features": "needs_encoding",
+        "class_imbalance": "none"
+      }
+    },
+    {
+      "name": "FT-Transformer",
+      "category": "deep_learning",
+      "tuned": false,
+      "metrics": {
+        "auc_roc": 0.8122,
+        "log_loss": 0.4718,
+        "train_time_sec": 74.2,
+        "inference_time_ms_per_1k": 18.4,
+        "peak_memory_mb": 544.0
+      },
+      "scaling": [
+        {
+          "n_samples": 500,
+          "auc": 0.7675
+        },
+        {
+          "n_samples": 1000,
+          "auc": 0.7827
+        },
+        {
+          "n_samples": 2000,
+          "auc": 0.7946
+        },
+        {
+          "n_samples": 3500,
+          "auc": 0.8044
+        },
+        {
+          "n_samples": 5600,
+          "auc": 0.8131
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "needs_imputation",
         "categorical_features": "needs_encoding",
         "class_imbalance": "none"
       }

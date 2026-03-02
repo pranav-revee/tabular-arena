@@ -30,9 +30,9 @@ def _best(results, metric, minimize=False):
 def render():
     # Hero
     st.markdown(
-        '<div style="padding:1.5rem 0 2rem 0;">'
+        '<div style="padding:0.8rem 0 1.4rem 0;">'
         '<div class="hero-title">Tabular Arena ⚔️</div>'
-        '<div class="hero-sub">Fundamental just raised $255M for NEXUS, a Large Tabular Model that claims to replace your entire ML pipeline with one line of code. But it\'s closed-source. We benchmark what\'s actually available today.</div>'
+        '<div class="hero-sub">Can foundation-style tabular models really replace a tuned classical ML stack? We evaluate that claim on three datasets that scale from small business tabular to large imbalanced fraud.</div>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -41,13 +41,14 @@ def render():
     st.markdown(
         '<div class="card" style="margin-bottom:24px;">'
         '<p style="font-size:0.88rem;line-height:1.75;color:#BDC1C6;margin:0;">'
-        'Fundamental\'s <strong style="color:#FF7597">NEXUS</strong> promises zero-shot tabular prediction &mdash; '
-        'trained on a billion tables, no feature engineering, no data pipelines. '
-        'But it\'s behind an AWS paywall. So we test the open-source alternatives: '
+        'The central test is not just raw AUC. It is whether an <strong style="color:#FF7597">LLM-style tabular model</strong> can stay competitive '
+        'as data regime changes from <strong style="color:#E8EAED">small</strong> to <strong style="color:#E8EAED">very large + imbalanced</strong>. '
+        'We compare open alternatives: '
         '<strong style="color:#FF7597">TabPFN</strong> (foundation model) and '
         '<strong style="color:#FFB74D">FT-Transformer</strong> (deep learning) against '
         '<strong style="color:#03DAC6">LightGBM</strong>, '
-        '<strong style="color:#03DAC6">CatBoost</strong>, and '
+        '<strong style="color:#03DAC6">CatBoost</strong>, '
+        '<strong style="color:#03DAC6">XGBoost</strong>, and '
         '<strong style="color:#BB86FC">AutoGluon</strong>. '
         'Same data, same splits, same metrics. Two modes: '
         '<strong style="color:#E8EAED">zero-effort</strong> (defaults) and '
@@ -95,6 +96,22 @@ def render():
         f'<span style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#9AA0A6;margin-right:12px;">Protocol</span>'
         f'<span style="color:#BDC1C6;font-size:0.82rem;">5-fold stratified CV · 80/20 split (seed 42) · Wall-clock timing · tracemalloc · Scaling at 500–5,600 samples</span>'
         f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Use-case matrix
+    st.markdown(
+        '<div class="card" style="margin-top:12px;">'
+        '<div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#9AA0A6;margin-bottom:14px;">Model Use-Case Lens</div>'
+        '<table class="lb"><thead><tr>'
+        '<th>Model Family</th><th>Best Fit</th><th>Risk</th>'
+        '</tr></thead><tbody>'
+        '<tr><td class="model-name">Gradient Boosting</td><td>Large/structured tabular, strong production baselines</td><td class="worst">Needs careful tuning/encoding</td></tr>'
+        '<tr><td class="model-name">AutoML (AutoGluon)</td><td>Fast path to high accuracy</td><td class="worst">High memory/time overhead</td></tr>'
+        '<tr><td class="model-name">Foundation Model (TabPFN)</td><td>Strong low-data signal extraction</td><td class="worst">Scaling/inference constraints on very large data</td></tr>'
+        '<tr><td class="model-name">Deep Learning (FT-Transformer)</td><td>Can improve with data + tuning</td><td class="worst">Often less reliable than tuned trees on tabular</td></tr>'
+        '</tbody></table>'
+        '</div>',
         unsafe_allow_html=True,
     )
 

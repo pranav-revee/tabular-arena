@@ -654,7 +654,7 @@ def run_tabpfn(X_train, X_test, y_train, y_test, X_full, y_full):
     X_tr_enc, X_te_enc = encode_for_numeric(X_train, X_test)
 
     def train_fn(X, y):
-        model = TabPFNClassifier(device="cpu")
+        model = TabPFNClassifier(device="cpu", ignore_pretraining_limits=True)
         model.fit(X, y)
         return model
 
@@ -823,6 +823,8 @@ def main():
     runners = [
         ("LightGBM (Default)", run_lgbm_default),
         ("LightGBM (Tuned)", run_lgbm_tuned),
+        ("XGBoost (Default)", run_xgb_default),
+        ("XGBoost (Tuned)", run_xgb_tuned),
         ("CatBoost (Default)", run_catboost_default),
         ("CatBoost (Tuned)", run_catboost_tuned),
         ("AutoGluon", run_autogluon),

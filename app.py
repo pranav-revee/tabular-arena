@@ -11,8 +11,8 @@ st.markdown('<style>'
     '@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");'
     '@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");'
     'html,body,[class*="css"]{font-family:"Inter",system-ui,-apple-system,sans-serif;}'
-    '.stApp{background:#0F1117;color:#E8EAED;}'
-    '.block-container{padding:2rem 3rem 3rem 3rem;max-width:1200px;}'
+    '.stApp{background:radial-gradient(circle at 15% 0%, #17263C 0%, #0F1117 45%, #0A0D14 100%);color:#E8EAED;}'
+    '.block-container{padding:2rem 3rem 3rem 3rem;max-width:1280px;}'
     '#MainMenu,footer,header{visibility:hidden;}'
     '.stDeployButton{display:none;}'
     # Tabs
@@ -22,9 +22,9 @@ st.markdown('<style>'
     '.stTabs [aria-selected="true"]{background:rgba(187,134,252,0.15) !important;color:#BB86FC !important;font-weight:600;border-bottom:none !important;}'
     '.stTabs [data-baseweb="tab-highlight"],.stTabs [data-baseweb="tab-border"]{display:none;}'
     # Cards
-    '.card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}'
+    '.card{background:linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;box-shadow:0 18px 42px rgba(0,0,0,0.35);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}'
     # Metric cards
-    '.metric-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:22px 24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-left:3px solid #BB86FC;}'
+    '.metric-card{background:linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:22px 24px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-left:3px solid #BB86FC;}'
     '.metric-label{font-size:0.72rem;font-weight:600;color:#9AA0A6;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}'
     '.metric-value{font-size:1.8rem;font-weight:700;color:#E8EAED;font-family:"JetBrains Mono",monospace;line-height:1.2;}'
     '.metric-detail{font-size:0.78rem;color:#9AA0A6;margin-top:4px;font-weight:500;}'
@@ -35,6 +35,8 @@ st.markdown('<style>'
     # Hero
     '.hero-title{font-size:2.6rem;font-weight:800;letter-spacing:-0.04em;line-height:1.1;color:#E8EAED;margin-bottom:10px;}'
     '.hero-sub{font-size:1.1rem;color:#9AA0A6;line-height:1.6;max-width:580px;}'
+    '.top-ribbon{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;padding:10px 14px;border-radius:12px;background:linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.1);font-size:0.78rem;color:#BDC1C6;}'
+    '.top-ribbon .badge{display:inline-block;padding:2px 10px;border-radius:999px;background:rgba(187,134,252,0.15);border:1px solid rgba(187,134,252,0.25);color:#D6BCFA;font-size:0.66rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-right:8px;}'
     # Pills
     '.pill{display:inline-block;padding:3px 12px;border-radius:100px;font-size:0.72rem;font-weight:600;letter-spacing:0.02em;}'
     '.pill-green{background:rgba(3,218,198,0.12);color:#03DAC6;border:1px solid rgba(3,218,198,0.2);}'
@@ -96,8 +98,16 @@ st.markdown('<style>'
     '::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}'
 '</style>', unsafe_allow_html=True)
 
-from tabs import overview, churn
+from tabs import overview, churn, credit_risk, fraud, verdict
 from config import AUTHOR_NAME, GITHUB_URL, LINKEDIN_URL
+
+st.markdown(
+    '<div class="top-ribbon">'
+    '<div><span class="badge">Research Story</span>Can foundation-style tabular models match tuned trees across scale?</div>'
+    '<div style="font-family:\'JetBrains Mono\',monospace;color:#9AA0A6;">3 datasets · 9 models · unified protocol</div>'
+    '</div>',
+    unsafe_allow_html=True,
+)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Churn", "Credit Risk", "Fraud", "Verdict"])
 
@@ -106,11 +116,11 @@ with tab1:
 with tab2:
     churn.render()
 with tab3:
-    st.markdown('<div style="padding:4rem 0;text-align:center;color:#5F6368;font-size:0.9rem;">Coming soon</div>', unsafe_allow_html=True)
+    credit_risk.render()
 with tab4:
-    st.markdown('<div style="padding:4rem 0;text-align:center;color:#5F6368;font-size:0.9rem;">Coming soon</div>', unsafe_allow_html=True)
+    fraud.render()
 with tab5:
-    st.markdown('<div style="padding:4rem 0;text-align:center;color:#5F6368;font-size:0.9rem;">Available after all datasets are benchmarked</div>', unsafe_allow_html=True)
+    verdict.render()
 
 links = []
 if GITHUB_URL:

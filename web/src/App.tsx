@@ -6,18 +6,39 @@ import { ResultsGlance } from './components/ResultsGlance'
 import { Footer } from './components/Footer'
 import { ChurnTab } from './components/ChurnTab'
 import { CreditRiskTab } from './components/CreditRiskTab'
+import { FraudTab } from './components/FraudTab'
+import { VerdictTab } from './components/VerdictTab'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function App() {
   const [activeTab, setActiveTab] = useState('overview')
   return (
-    <div className="min-h-screen w-full bg-[#0a0f1a] text-zinc-200 selection:bg-emerald-500/30 selection:text-emerald-200 font-sans relative overflow-hidden">
-      {/* Ambient Background Orbs */}
+    <div className="min-h-screen w-full text-zinc-200 selection:bg-emerald-500/30 selection:text-emerald-200 font-sans relative overflow-hidden">
+      <div className="grid-overlay" />
       <div className="ambient-light ambient-emerald" />
       <div className="ambient-light ambient-violet" />
       <div className="ambient-light ambient-amber" />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-14">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-6 md:mb-8"
+        >
+          <div className="glass-panel rounded-2xl px-4 py-3 md:px-5 md:py-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="text-xs md:text-sm text-zinc-300 tracking-wide">
+              <span className="inline-flex items-center rounded-full border border-violet-300/20 bg-violet-300/10 px-2 py-0.5 text-[11px] font-semibold uppercase text-violet-200 mr-2">
+                Research Story
+              </span>
+              Can foundation-style models read tabular data as well as tuned trees?
+            </div>
+            <div className="text-[11px] md:text-xs font-mono text-zinc-400">
+              3 datasets · 9 models · unified protocol
+            </div>
+          </div>
+        </motion.div>
+
         <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
         <main className="min-h-[60vh]">
@@ -49,6 +70,10 @@ export function App() {
               <ChurnTab key="churn" />
             ) : activeTab === 'credit-risk' ? (
               <CreditRiskTab key="credit-risk" />
+            ) : activeTab === 'fraud' ? (
+              <FraudTab key="fraud" />
+            ) : activeTab === 'verdict' ? (
+              <VerdictTab key="verdict" />
             ) : (
               <motion.div
                 key="placeholder"

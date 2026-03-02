@@ -119,6 +119,44 @@ export const churnData = {
       ],
     },
     {
+      name: 'TabPFN',
+      category: 'foundation_model',
+      tuned: false,
+      metrics: {
+        auc_roc: 0.8404,
+        log_loss: 0.4228,
+        train_time_sec: 6.7,
+        inference_time_ms_per_1k: 1280.0,
+        peak_memory_mb: 612.3,
+      },
+      scaling: [
+        { n_samples: 500, auc: 0.8184 },
+        { n_samples: 1000, auc: 0.8301 },
+        { n_samples: 2000, auc: 0.8367 },
+        { n_samples: 3500, auc: 0.8392 },
+        { n_samples: 5600, auc: 0.8408 },
+      ],
+    },
+    {
+      name: 'FT-Transformer',
+      category: 'deep_learning',
+      tuned: false,
+      metrics: {
+        auc_roc: 0.8122,
+        log_loss: 0.4718,
+        train_time_sec: 74.2,
+        inference_time_ms_per_1k: 18.4,
+        peak_memory_mb: 544.0,
+      },
+      scaling: [
+        { n_samples: 500, auc: 0.7675 },
+        { n_samples: 1000, auc: 0.7827 },
+        { n_samples: 2000, auc: 0.7946 },
+        { n_samples: 3500, auc: 0.8044 },
+        { n_samples: 5600, auc: 0.8131 },
+      ],
+    },
+    {
       name: 'AutoGluon',
       category: 'automl',
       tuned: false,
@@ -149,6 +187,7 @@ export const MODEL_COLORS: Record<string, string> = {
   'XGBoost (Tuned)': '#818cf8',
   AutoGluon: '#f59e0b',
   TabPFN: '#f43f5e',
+  'FT-Transformer': '#38bdf8',
 }
 
 export const CATEGORY_COLORS: Record<string, string> = {

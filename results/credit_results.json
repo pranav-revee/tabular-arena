@@ -65,7 +65,7 @@
         "log_loss": 0.2371,
         "train_time_sec": 180.1,
         "inference_time_ms_per_1k": 1.8,
-        "peak_memory_mb": 0.0,
+        "peak_memory_mb": 108.6,
         "search_time_sec": 178.74,
         "fit_time_sec": 1.36
       },
@@ -145,6 +145,51 @@
       }
     },
     {
+      "name": "CatBoost (Tuned)",
+      "category": "gradient_boosting",
+      "tuned": true,
+      "metrics": {
+        "auc_roc": 0.7836,
+        "log_loss": 0.2374,
+        "train_time_sec": 1368.9,
+        "inference_time_ms_per_1k": 3.2,
+        "peak_memory_mb": 347.2,
+        "search_time_sec": 1337.4,
+        "fit_time_sec": 31.5
+      },
+      "scaling": [
+        {
+          "n_samples": 1000,
+          "auc": 0.7032
+        },
+        {
+          "n_samples": 5000,
+          "auc": 0.7399
+        },
+        {
+          "n_samples": 20000,
+          "auc": 0.7672
+        },
+        {
+          "n_samples": 50000,
+          "auc": 0.7771
+        },
+        {
+          "n_samples": 150000,
+          "auc": 0.783
+        },
+        {
+          "n_samples": 245000,
+          "auc": 0.784
+        }
+      ],
+      "raw_data_handling": {
+        "missing_values": "native",
+        "categorical_features": "native",
+        "class_imbalance": "auto_class_weights"
+      }
+    },
+    {
       "name": "LightGBM (Default)",
       "category": "gradient_boosting",
       "tuned": false,
@@ -196,7 +241,7 @@
         "log_loss": 0.2372,
         "train_time_sec": 904.04,
         "inference_time_ms_per_1k": 3.4,
-        "peak_memory_mb": 0.2,
+        "peak_memory_mb": 1.3,
         "search_time_sec": 897.06,
         "fit_time_sec": 6.98
       },
@@ -307,8 +352,8 @@
       "category": "deep_learning",
       "tuned": false,
       "metrics": {
-        "auc_roc": 0.6289,
-        "log_loss": 0.2731,
+        "auc_roc": 0.7392,
+        "log_loss": 0.2528,
         "train_time_sec": 474.11,
         "inference_time_ms_per_1k": 8.4,
         "peak_memory_mb": 23.3
@@ -316,27 +361,27 @@
       "scaling": [
         {
           "n_samples": 1000,
-          "auc": 0.4875
+          "auc": 0.6651
         },
         {
           "n_samples": 5000,
-          "auc": 0.5146
+          "auc": 0.6924
         },
         {
           "n_samples": 20000,
-          "auc": 0.5308
+          "auc": 0.716
         },
         {
           "n_samples": 50000,
-          "auc": 0.5531
+          "auc": 0.7289
         },
         {
           "n_samples": 150000,
-          "auc": 0.5981
+          "auc": 0.7376
         },
         {
           "n_samples": 245000,
-          "auc": 0.5878
+          "auc": 0.7408
         }
       ],
       "raw_data_handling": {
